@@ -32,7 +32,11 @@ cp .env.example .env          # add an AI Gateway key
 npm run fetch                 # about 8,000 roles scanned, product roles kept
 npm run sample                # 40 random postings, under half a cent
 npm run label                 # everything, about 8 cents
+npm run snapshot              # build data/radar.json for the site
+npm run dev                   # site at localhost:3000
 ```
+
+A GitHub Action refreshes postings and labels new ones every morning. Answers are cached, so it only pays for postings it hasn't seen, and each run is capped at $0.25.
 
 ## Eval
 

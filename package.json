@@ -7,11 +7,22 @@
   "scripts": {
     "fetch": "python3 pipeline/fetch.py --out data/input.jsonl",
     "label": "node pipeline/label.mjs",
-    "sample": "node pipeline/label.mjs --sample 40"
+    "sample": "node pipeline/label.mjs --sample 40",
+    "snapshot": "node pipeline/snapshot.mjs",
+    "dev": "next dev",
+    "build": "next build"
   },
   "license": "MIT",
   "dependencies": {
     "@ai-sdk/gateway": "^4.0.96",
-    "ai": "^7.0.118"
+    "ai": "^7.0.118",
+    "next": "^16.3.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
   }
 }

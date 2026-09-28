@@ -1,0 +1,59 @@
+name: Daily refresh
+
+on:
+  schedule:
+    - cron: '0 13 * * *' # 6am Pacific
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # commit the new snapshot, nothing else
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+
+      - name: Restore answer cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: data/cache.jsonl
+          key: jev-cache-${{ hashFiles('pipeline/spec.json') }}-${{ github.run_id }}
+          restore-keys: jev-cache-${{ hashFiles('pipeline/spec.json') }}-
+
+      - name: Fetch postings
+        run: npm run fetch
+
+      - name: Label new postings (capped at $0.25 per run)
+        env:
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+        run: |
+          if [ -z "$AI_GATEWAY_API_KEY" ]; then
+            echo "No AI_GATEWAY_API_KEY secret; publishing unlabeled postings."
+          else
+            node pipeline/label.mjs --max-usd 0.25
+          fi
+
+      - name: Build snapshot
+        run: npm run snapshot
+
+      - name: Commit if changed
+        run: |
+          git config user.name "radar-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/radar.json data/results.json 2>/dev/null || git add data/radar.json
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Daily refresh $(date -u +%F)"
+          git push

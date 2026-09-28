@@ -1,0 +1,76 @@
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --ink: #1c1b19; --muted: #6b6760; --line: #e7e3dc;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --chip: #f1eee8; --notice: #fff6e0; --notice-line: #f0d890;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141412; --surface: #1c1c19; --ink: #ecebe7; --muted: #a09c94; --line: #2e2d29;
+    --accent: #8aa8ff; --accent-ink: #10131c; --chip: #252521; --notice: #2a2415; --notice-line: #5a4a1e;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+main, .top, .foot { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+.top { display: flex; justify-content: space-between; align-items: center; height: 56px; border-bottom: 1px solid var(--line); }
+.brand { font-weight: 650; color: var(--ink); }
+.top nav { display: flex; gap: 18px; }
+.top nav a { color: var(--muted); }
+
+.hero { padding: 36px 0 12px; max-width: 760px; }
+h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 12px; }
+.lede { font-size: 17px; margin: 0 0 10px; }
+.meta { color: var(--muted); font-size: 13px; margin: 0; }
+.notice { background: var(--notice); border: 1px solid var(--notice-line); border-radius: 8px; padding: 10px 14px; font-size: 14px; margin-top: 14px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 14px; }
+.chip { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.chip .n { opacity: 0.7; margin-left: 4px; font-variant-numeric: tabular-nums; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filters input[type=search], .filters select {
+  font: inherit; font-size: 14px; background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+}
+.filters input[type=search] { flex: 1 1 240px; min-width: 0; }
+.check { font-size: 14px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+.count { color: var(--muted); font-size: 13px; margin: 14px 0 6px; }
+
+.roles { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.roles th, .roles td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14px; }
+.roles th { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.roles tr:last-child td { border-bottom: 0; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tag { font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 6px; color: var(--muted); }
+.empty { color: var(--muted); padding: 24px 0; }
+
+.foot { color: var(--muted); font-size: 13px; padding: 32px 16px 40px; }
+
+.prose { max-width: 760px; padding: 36px 0 12px; }
+.prose h2 { font-size: 20px; margin: 32px 0 8px; }
+.prose h3 { font-size: 16px; margin: 20px 0 4px; }
+.prose code { font-size: 13px; background: var(--chip); padding: 1px 5px; border-radius: 4px; }
+.qtype { font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+.q ul { padding-left: 18px; }
+.q li { margin: 3px 0; }
+
+@media (max-width: 720px) {
+  h1 { font-size: 24px; }
+  .roles, .roles tbody, .roles tr, .roles td { display: block; width: 100%; }
+  .roles thead { display: none; }
+  .roles { border: 0; background: transparent; }
+  .roles tr { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; padding: 6px 0; }
+  .roles td { border: 0; padding: 3px 14px; display: flex; gap: 10px; }
+  .roles td::before { content: attr(data-label); color: var(--muted); font-size: 12px; min-width: 88px; }
+  .roles td:first-child { font-weight: 600; }
+  .roles td:first-child::before { display: none; }
+}
