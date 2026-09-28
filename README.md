@@ -38,6 +38,10 @@ npm run label                 # everything, about 8 cents
 
 Coming next: a hand-labeled golden set, with Jev compared against a title regex on accuracy, cost and latency.
 
+## Security
+
+See [SECURITY.md](SECURITY.md).
+
 ## License
 
 MIT

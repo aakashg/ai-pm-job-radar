@@ -37,17 +37,31 @@ const qhash = sha1(JSON.stringify([MODEL, questions])).slice(0, 10);
 const stateFor = (it) => ({ ...spec.context, ...Object.fromEntries(spec.state_fields.map((f) => [f, it[f]])) });
 const keyFor = (state) => sha1(qhash + JSON.stringify(state));
 
-if (dryRun) {
-  const chars = items.reduce((n, it) => n + JSON.stringify({ state: stateFor(it), questions }).length, 0);
-  const tokens = Math.round(chars / 4);
-  console.log(`${items.length} items, ~${tokens.toLocaleString()} input tokens, ~$${(tokens * PRICE_PER_TOKEN).toFixed(4)}`);
-  process.exit(0);
-}
-
 const cachePath = path.join(DATA, 'cache.jsonl');
 const cache = new Map(fs.existsSync(cachePath)
   ? fs.readFileSync(cachePath, 'utf8').split('\n').filter(Boolean).map((l) => { const r = JSON.parse(l); return [r.key, r]; })
   : []);
+
+// Spend guard: estimate only the uncached calls, and refuse to run past the budget cap or past
+// the Gateway's remaining free credit. Raise the cap on purpose with --max-usd, never by default.
+const maxUsd = Number(flag('max-usd', 0.25));
+const uncached = items.filter((it) => !cache.has(keyFor(stateFor(it))));
+const estTokens = Math.round(uncached.reduce((n, it) => n + JSON.stringify({ state: stateFor(it), questions }).length, 0) / 4);
+const estUsd = estTokens * PRICE_PER_TOKEN;
+console.log(`${items.length} items, ${uncached.length} uncached, ~${estTokens.toLocaleString()} input tokens, ~$${estUsd.toFixed(4)} (cap $${maxUsd})`);
+if (dryRun) process.exit(0);
+if (estUsd > maxUsd) {
+  console.error(`Estimated $${estUsd.toFixed(4)} is over the $${maxUsd} cap. Rerun with --max-usd to allow it.`);
+  process.exit(1);
+}
+if (uncached.length) {
+  const { balance } = await gateway.getCredits();
+  if (Number(balance) < estUsd * 2) {
+    console.error(`Gateway credit balance is $${balance}; not enough headroom for ~$${estUsd.toFixed(4)}. Stopping.`);
+    process.exit(1);
+  }
+  console.log(`Gateway credit balance: $${balance}`);
+}
 const cacheOut = fs.createWriteStream(cachePath, { flags: 'a' });
 
 const t0 = Date.now();
@@ -80,7 +94,7 @@ cacheOut.end();
 const done = rows.filter(Boolean);
 const secs = ((Date.now() - t0) / 1000).toFixed(1);
 const counts = countBy(done, 'bucket');
-const headline = `${done.length} postings in ${secs} s for $${(tokens * PRICE_PER_TOKEN).toFixed(4)} (${calls} new calls, ${done.length - calls} cached${failed ? `, ${failed} failed` : ''}), ${modelId ?? 'all cached'}`;
+const headline = `${done.length} postings in ${secs} s for $${(tokens * PRICE_PER_TOKEN).toFixed(4)} (${calls} new calls, ${done.length - calls} cached${failed ? `, ${failed} failed` : ''}), ${modelId ?? 'no new calls'}`;
 
 const outName = sample ? `sample-${sample}` : 'results';
 fs.writeFileSync(path.join(DATA, `${outName}.json`), JSON.stringify({ generatedAt: new Date().toISOString(), model: modelId, headline, counts, rows: done }, null, 1));
