@@ -1,0 +1,8 @@
+{
+  "greenhouse": ["anthropic", "databricks", "scaleai", "xai", "stripe", "figma", "airbnb", "robinhood",
+                 "datadog", "instacart", "pinterest", "dropbox", "cloudflare", "coinbase", "brex",
+                 "gleanwork", "asana", "duolingo", "lyft"],
+  "ashby": ["openai", "notion", "ramp", "linear", "cursor", "perplexity", "elevenlabs", "harvey",
+            "cohere", "replit", "supabase", "deepgram", "sierra", "decagon", "writer", "lovable"],
+  "lever": ["palantir"]
+}

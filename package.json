@@ -1,0 +1,17 @@
+{
+  "name": "ai-pm-job-radar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Every open PM role at 36 AI and tech companies, sorted by Jev into AI PM (no ML needed), AI PM (ML needed), non-AI PM, and not PM.",
+  "scripts": {
+    "fetch": "python3 pipeline/fetch.py --out data/input.jsonl",
+    "label": "node pipeline/label.mjs",
+    "sample": "node pipeline/label.mjs --sample 40"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@ai-sdk/gateway": "^4.0.96",
+    "ai": "^7.0.118"
+  }
+}
